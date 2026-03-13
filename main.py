@@ -1,6 +1,7 @@
 from student_manager import *
+from database import create_table
 
-load_students()
+create_table()
 
 while True:
 
@@ -11,7 +12,7 @@ while True:
     print("4. Delete Student")
     print("5. Exit")
 
-    choice = input("Enter your choice: ")
+    choice = input("Enter choice: ")
 
     if choice == "1":
         add_student()
@@ -26,9 +27,8 @@ while True:
         delete_student()
 
     elif choice == "5":
-        save_students()
-        print("Data saved. Goodbye!")
+        print("Goodbye")
         break
 
     else:
-        print("Invalid choice. Please try again.")
+        print("Invalid choice")
