@@ -1,34 +1,112 @@
-from student_manager import *
+from flask import Flask, request, jsonify
+import sqlite3
 from database import create_table
+
+app = Flask(__name__)
+
+DB_NAME = "students.db"
 
 create_table()
 
-while True:
+def connect():
+    return sqlite3.connect(DB_NAME)
 
-    print("\n===== Student Management System =====")
-    print("1. Add Student")
-    print("2. View Students")
-    print("3. Search Student")
-    print("4. Delete Student")
-    print("5. Exit")
 
-    choice = input("Enter choice: ")
+@app.route("/students", methods=["POST"])
+def add_student():
 
-    if choice == "1":
-        add_student()
+    data = request.json
 
-    elif choice == "2":
-        view_students()
+    student_id = data["id"]
+    name = data["name"]
+    age = data["age"]
+    course = data["course"]
 
-    elif choice == "3":
-        search_student()
+    conn = connect()
+    cursor = conn.cursor()
 
-    elif choice == "4":
-        delete_student()
+    cursor.execute(
+        "INSERT INTO students VALUES (?, ?, ?, ?)",
+        (student_id, name, age, course)
+    )
 
-    elif choice == "5":
-        print("Goodbye")
-        break
+    conn.commit()
+    conn.close()
 
-    else:
-        print("Invalid choice")
+    return jsonify({"message": "Student added"})
+
+
+@app.route("/students", methods=["GET"])
+def get_students():
+
+    conn = connect()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT * FROM students")
+
+    students = cursor.fetchall()
+
+    result = []
+
+    for s in students:
+        result.append({
+            "id": s[0],
+            "name": s[1],
+            "age": s[2],
+            "course": s[3]
+        })
+
+    conn.close()
+
+    return jsonify(result)
+
+
+@app.route("/students/<student_id>", methods=["GET"])
+def get_student(student_id):
+
+    conn = connect()
+    cursor = conn.cursor()
+
+    cursor.execute(
+        "SELECT * FROM students WHERE id=?",
+        (student_id,)
+    )
+
+    student = cursor.fetchone()
+
+    conn.close()
+
+    if student:
+        return jsonify({
+            "id": student[0],
+            "name": student[1],
+            "age": student[2],
+            "course": student[3]
+        })
+
+    return jsonify({"message": "Student not found"})
+
+
+@app.route("/students/<student_id>", methods=["DELETE"])
+def delete_student(student_id):
+
+    conn = connect()
+    cursor = conn.cursor()
+
+    cursor.execute(
+        "DELETE FROM students WHERE id=?",
+        (student_id,)
+    )
+
+    conn.commit()
+
+    if cursor.rowcount == 0:
+        return jsonify({"message": "Student not found"})
+
+    conn.close()
+
+    return jsonify({"message": "Student deleted"})
+
+
+if __name__ == "__main__":
+    app.run(debug=True)

@@ -5,7 +5,6 @@ DB_NAME = "students.db"
 def connect():
     return sqlite3.connect(DB_NAME)
 
-
 def create_table():
     conn = connect()
     cursor = conn.cursor()

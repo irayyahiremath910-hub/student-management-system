@@ -1,6 +1,6 @@
 # Student Management System API
 
-A REST API built using Flask and SQLite to manage student records.
+A simple REST API built with Flask and SQLite to manage student records.
 
 ## Features
 
@@ -15,7 +15,7 @@ A REST API built using Flask and SQLite to manage student records.
 - Flask
 - SQLite
 
-## Run
+## Run the project
 
 pip install -r requirements.txt
 
